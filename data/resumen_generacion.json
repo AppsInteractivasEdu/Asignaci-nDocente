@@ -1,0 +1,359 @@
+{
+ "fecha": "2026-10-16T15:04:58.513Z",
+ "stats": {
+  "programas": 11,
+  "total": 356,
+  "porComp": {
+   "Pedagógico": 150,
+   "Didáctica de las Disciplinas": 78,
+   "Práctica Pedagógica Investigativa": 128
+  },
+  "porEstado": {
+   "Asignación propuesta": 299,
+   "Asignación aprobada": 0,
+   "Pendiente por designar": 22,
+   "Perfil no disponible": 34,
+   "Pendiente de validación": 1
+  },
+  "conDocente": 300,
+  "pendientes": 22,
+  "sinPerfil": 34,
+  "pctAprobadas": 0,
+  "porPrograma": [
+   {
+    "programa": "Licenciatura en Artes",
+    "total": 33,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 8,
+    "Práctica Pedagógica Investigativa": 11,
+    "Asignación propuesta": 28,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 3,
+    "Pendiente de validación": 0,
+    "conDocente": 28
+   },
+   {
+    "programa": "Licenciatura en Ciencias Naturales y Educación Ambiental",
+    "total": 34,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 8,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 31,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 0,
+    "conDocente": 31
+   },
+   {
+    "programa": "Licenciatura en Educación Campesina y Rural",
+    "total": 39,
+    "Pedagógico": 19,
+    "Didáctica de las Disciplinas": 8,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 36,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 0,
+    "conDocente": 36
+   },
+   {
+    "programa": "Licenciatura en Educación Infantil",
+    "total": 28,
+    "Pedagógico": 12,
+    "Didáctica de las Disciplinas": 4,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 24,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 3,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 0,
+    "conDocente": 24
+   },
+   {
+    "programa": "Licenciatura en Etnoeducación",
+    "total": 33,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 7,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 29,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 1,
+    "conDocente": 30
+   },
+   {
+    "programa": "Licenciatura en Lenguas Extranjeras con Énfasis en Inglés",
+    "total": 36,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 7,
+    "Práctica Pedagógica Investigativa": 15,
+    "Asignación propuesta": 30,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 4,
+    "Pendiente de validación": 0,
+    "conDocente": 30
+   },
+   {
+    "programa": "Licenciatura en Literatura y Lengua Castellana",
+    "total": 38,
+    "Pedagógico": 16,
+    "Didáctica de las Disciplinas": 10,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 34,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 2,
+    "Pendiente de validación": 0,
+    "conDocente": 34
+   },
+   {
+    "programa": "Licenciatura en Literatura y Lengua Castellana (Distancia)",
+    "total": 17,
+    "Pedagógico": 7,
+    "Didáctica de las Disciplinas": 4,
+    "Práctica Pedagógica Investigativa": 6,
+    "Asignación propuesta": 0,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 0,
+    "Perfil no disponible": 17,
+    "Pendiente de validación": 0,
+    "conDocente": 0
+   },
+   {
+    "programa": "Licenciatura en Matemáticas",
+    "total": 35,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 9,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 32,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 0,
+    "conDocente": 32
+   },
+   {
+    "programa": "Licenciatura en Química",
+    "total": 33,
+    "Pedagógico": 14,
+    "Didáctica de las Disciplinas": 7,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 29,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 2,
+    "Perfil no disponible": 2,
+    "Pendiente de validación": 0,
+    "conDocente": 29
+   },
+   {
+    "programa": "Licenciatura en Tecnología",
+    "total": 30,
+    "Pedagógico": 12,
+    "Didáctica de las Disciplinas": 6,
+    "Práctica Pedagógica Investigativa": 12,
+    "Asignación propuesta": 26,
+    "Asignación aprobada": 0,
+    "Pendiente por designar": 3,
+    "Perfil no disponible": 1,
+    "Pendiente de validación": 0,
+    "conDocente": 26
+   }
+  ],
+  "docentes": 146
+ },
+ "qa": [
+  {
+   "nombre": "Todas las asignaturas provienen de los planes de estudio suministrados",
+   "estado": "Cumple",
+   "detalle": "356 asignaturas extraídas de 2 archivo(s) de plan."
+  },
+  {
+   "nombre": "Cada asignatura está asociada al programa académico de su plan",
+   "estado": "Cumple",
+   "detalle": "Sin inconsistencias."
+  },
+  {
+   "nombre": "Los perfiles utilizados corresponden al programa y a la asignatura",
+   "estado": "Cumple",
+   "detalle": "18 asociaciones por equivalencia de denominación señaladas para validación."
+  },
+  {
+   "nombre": "Los profesores con estado \"Asignación propuesta\" acreditan los requisitos obligatorios verificables",
+   "estado": "Cumple",
+   "detalle": "Todas las propuestas cumplen pregrado, posgrado, experiencia mínima y estado de hoja de vida."
+  },
+  {
+   "nombre": "Asignaciones manuales que no cumplen requisitos están marcadas para validación",
+   "estado": "Cumple",
+   "detalle": "0 asignaciones manuales sin requisitos verificables."
+  },
+  {
+   "nombre": "No existen asignaciones sustentadas en docentes inexistentes en la base",
+   "estado": "Cumple",
+   "detalle": "Todas las justificaciones citan títulos y experiencia registrados en los archivos."
+  },
+  {
+   "nombre": "Asignaturas sin perfil o sin docente idóneo figuran como pendientes",
+   "estado": "Cumple",
+   "detalle": "Sin perfil: 34; pendientes por designar: 22."
+  },
+  {
+   "nombre": "Ningún docente supera el tope de 8 h",
+   "estado": "Cumple",
+   "detalle": "146 docentes con carga asignada."
+  },
+  {
+   "nombre": "No hay asignaturas duplicadas en los planes",
+   "estado": "Cumple",
+   "detalle": "0 filas duplicadas omitidas."
+  },
+  {
+   "nombre": "Clasificación de componentes sin dudas",
+   "estado": "Revisar",
+   "detalle": "22 asignaturas señaladas para revisión de clasificación."
+  },
+  {
+   "nombre": "Todos los perfiles suministrados corresponden a asignaturas de los planes",
+   "estado": "Cumple",
+   "detalle": "Sin perfiles huérfanos."
+  },
+  {
+   "nombre": "Documentos de perfiles completos",
+   "estado": "Revisar",
+   "detalle": "4 perfiles con secciones faltantes o inconsistentes: Ciencias Naturales y Educación Ambiental – Educación Intercultural e Inclusiva; Lenguas Extranjeras con Énfasis en Inglés – Modelos Educativos Flexibles, Interculturales e Inclusivos (Plan de Transición); Artes – Historia de la Educación y la Pedagogía; Artes – Saberes Interculturales e Inteligencia Artificial para la Enseñanza (Plan de Transición)"
+  }
+ ],
+ "archivos": [
+  {
+   "tipo": "Plan de estudios",
+   "nombre": "PLan de estudio consolidado (plan de transición).xlsx",
+   "detalle": "Plan de transición · hoja \"Plan de estudio consolidado\" · 542 filas",
+   "filas": 542,
+   "tamano": 28942,
+   "cargado": "2026-09-01T21:24:28.114Z",
+   "huella": "49690ccb109866b4"
+  },
+  {
+   "tipo": "Plan de estudios",
+   "nombre": "Planes de estudio Licenciaturas anteriores.xlsx",
+   "detalle": "Plan anterior · hoja \"Datos_Programas\" · 522 filas",
+   "filas": 522,
+   "tamano": 26418,
+   "cargado": "2026-09-01T22:05:58.585Z",
+   "huella": "075c5ec809c485bb"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic en Etnoeducacion.docx",
+   "detalle": "Licenciatura en Etnoeducación · 24 perfiles",
+   "filas": 24,
+   "tamano": 51418,
+   "cargado": "2026-09-25T14:36:28.000Z",
+   "huella": "6e5b96c02a879dfd"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic en Literatura y Lengua Castellana.docx",
+   "detalle": "Licenciatura en Literatura y Lengua Castellana · 26 perfiles",
+   "filas": 26,
+   "tamano": 58064,
+   "cargado": "2026-09-25T15:31:52.000Z",
+   "huella": "1dcbb76e9839762b"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic en Matematicas.docx",
+   "detalle": "Licenciatura en Matemáticas · 27 perfiles",
+   "filas": 27,
+   "tamano": 55057,
+   "cargado": "2026-09-25T15:50:01.000Z",
+   "huella": "3d5f2903ea100c8b"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic en Quimica.docx",
+   "detalle": "Licenciatura en Química · 23 perfiles",
+   "filas": 23,
+   "tamano": 52434,
+   "cargado": "2026-09-25T16:00:51.000Z",
+   "huella": "722c332c1a09c66a"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic. Ciencias Naturales Y EA.docx",
+   "detalle": "Licenciatura en Ciencias Naturales y Educación Ambiental · 22 perfiles",
+   "filas": 22,
+   "tamano": 47494,
+   "cargado": "2026-09-25T16:15:59.000Z",
+   "huella": "5e852dcd7f3003b2"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic. Lenguas Extranjeras con enfasis en Ingles.docx",
+   "detalle": "Licenciatura en Lenguas Extranjeras con Énfasis en Inglés · 25 perfiles",
+   "filas": 25,
+   "tamano": 56065,
+   "cargado": "2026-09-25T16:40:40.000Z",
+   "huella": "1fd6d71a07f2d540"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic. en Artes.docx",
+   "detalle": "Licenciatura en Artes · 22 perfiles",
+   "filas": 22,
+   "tamano": 58502,
+   "cargado": "2026-09-25T16:29:54.000Z",
+   "huella": "44c1be8807f8f772"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic. en Educ. Campesina y Rural.docx",
+   "detalle": "Licenciatura en Educación Campesina y Rural · 32 perfiles",
+   "filas": 32,
+   "tamano": 60451,
+   "cargado": "2026-09-25T16:25:52.000Z",
+   "huella": "51591d94f4cd505e"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Lic. en Educ. Infantil.docx",
+   "detalle": "Licenciatura en Educación Infantil · 20 perfiles",
+   "filas": 20,
+   "tamano": 46885,
+   "cargado": "2026-09-25T15:09:59.000Z",
+   "huella": "355b3753d1daada2"
+  },
+  {
+   "tipo": "Perfiles docentes",
+   "nombre": "Perfil docente Licenciatura en Tecnologia.docx",
+   "detalle": "Licenciatura en Tecnología · 19 perfiles",
+   "filas": 19,
+   "tamano": 49547,
+   "cargado": "2026-09-25T16:49:40.000Z",
+   "huella": "0bf9cca48e01ac9a"
+  },
+  {
+   "tipo": "Profesores – formación académica",
+   "nombre": "Formación académica.xlsx",
+   "detalle": "hoja \"Report\" · 8169 registros · 2706 personas",
+   "filas": 8169,
+   "tamano": 1322192,
+   "cargado": "2026-08-31T19:49:29.337Z",
+   "huella": "ffb6c88672bc6ec7"
+  },
+  {
+   "tipo": "Profesores – experiencia",
+   "nombre": "General Detalla Experiencia.xlsx",
+   "detalle": "hoja \"Report\" · 59669 registros · 2738 personas",
+   "filas": 59669,
+   "tamano": 4494052,
+   "cargado": "2026-08-29T16:42:22.980Z",
+   "huella": "b146a050c15b2ae0"
+  }
+ ]
+}

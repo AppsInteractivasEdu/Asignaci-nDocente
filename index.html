@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asignación Docente · Licenciaturas – Departamento de Pedagogía y Didáctica</title>
+  <meta name="description" content="Gestión y propuesta de asignación docente por programa académico – Departamento de Pedagogía y Didáctica">
+  <link rel="icon" href="img/logo-unimagdalena.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/logo-unimagdalena.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       AUTENTICACIÓN
+  ══════════════════════════════════════════════════════ -->
+  <section id="auth" class="auth hidden">
+    <!-- Barra institucional superior -->
+    <div class="auth-portal-bar">
+      <div class="portal-title">
+        <span>
+          PORTAL INSTITUCIONAL
+          <small>Facultad de Educación y Humanidades</small>
+        </span>
+      </div>
+      <div class="auth-server-badge">Servidor Académico Seguro</div>
+    </div>
+
+    <div class="auth-card">
+      <!-- Badge de ciclo -->
+      <div class="auth-cycle-badge">CICLO 2026–2027</div>
+
+      <!-- Logo Universidad del Magdalena -->
+      <div class="brand-logo-wrap">
+        <img src="img/logo-unimagdalena.png" alt="Universidad del Magdalena">
+      </div>
+
+      <h2 id="auth-title">Iniciar sesión</h2>
+      <p class="muted small" id="auth-sub">Asignación Docente · Licenciaturas — Departamento de Pedagogía y Didáctica</p>
+
+      <form id="auth-form" autocomplete="on" style="display:flex;flex-direction:column;gap:14px">
+        <label class="f hidden" data-setup>Nombre completo<input class="inp" name="nombre" autocomplete="name" placeholder="Nombre completo"></label>
+
+        <label class="f" style="text-transform:uppercase;font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted)">
+          Usuario institucional
+          <input class="inp" name="usuario" required autocomplete="username" placeholder="Ej. docente.pyd" style="text-transform:none">
+        </label>
+
+        <label class="f" style="text-transform:uppercase;font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted)">
+          Contraseña
+          <div class="auth-pass-wrap">
+            <input class="inp" type="password" name="clave" id="auth-pass" required minlength="6" autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="auth-pass-toggle" id="auth-pass-toggle" title="Mostrar/ocultar contraseña" aria-label="Mostrar contraseña">👁</button>
+          </div>
+        </label>
+
+        <label class="f hidden" data-setup style="text-transform:uppercase;font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted)">
+          Confirmar contraseña
+          <input class="inp" type="password" name="clave2" minlength="6" autocomplete="new-password" placeholder="••••••••">
+        </label>
+
+        <div class="auth-remember" id="auth-remember">
+          <label><input type="checkbox" id="auth-recuerda"> Recordar sesión</label>
+        </div>
+
+        <div id="auth-err" class="notice err hidden"></div>
+
+        <button class="btn primary" type="submit" id="auth-btn" style="margin-top:4px;padding:13px;justify-content:center;font-size:14.5px">
+          Ingresar al sistema →
+        </button>
+
+        <div class="auth-security-notice">
+          <b>Acceso restringido:</b> Uso exclusivo para personal autorizado del Departamento de Pedagogía y Didáctica. Todas las sesiones son auditadas.
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer de la página de login -->
+    <div class="auth-page-footer">
+      <span>© 2026 Departamento de Pedagogía y Didáctica · Universidad del Magdalena</span>
+      <nav>
+        <a href="#">Soporte</a>
+        <a href="#">v2.0 – Fase 7</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════
+       APP PRINCIPAL
+  ══════════════════════════════════════════════════════ -->
+  <div id="app" class="hidden">
+
+    <!-- Barra superior -->
+    <header class="topbar">
+      <div class="topbar-in">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><img src="img/logo-unimagdalena.png" alt="Universidad del Magdalena"></div>
+          <div style="min-width:0">
+            <h1>Asignación Docente · Licenciaturas</h1>
+            <p>Departamento de Pedagogía y Didáctica · Componentes Pedagógico, Didáctica y PPI</p>
+          </div>
+        </div>
+        <div class="userbox">
+          <div class="who"><b id="u-nombre"></b><span id="u-rol"></span></div>
+          <button class="btn-top" id="btn-theme" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema">◐</button>
+          <button class="btn-top" id="btn-logout">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pestañas de navegación -->
+    <nav class="tabs" aria-label="Secciones">
+      <div class="tabs-in" role="tablist">
+        <button class="tab active" data-view="resumen" role="tab">Resumen</button>
+        <button class="tab" data-view="asignacion" role="tab">Asignación docente</button>
+        <button class="tab" data-view="comparativo" role="tab">Comparativo 2026-II / 2027-I <span class="badge-new">Fase 7</span></button>
+        <button class="tab" data-view="excepciones" role="tab">Excepciones PPI <span class="badge-new">Fase 7</span></button>
+        <button class="tab" data-view="docentes" role="tab">Docentes</button>
+        <button class="tab" data-view="archivos" role="tab">Archivos y configuración</button>
+        <button class="tab" data-view="calidad" role="tab">Control de calidad</button>
+        <button class="tab" data-view="historial" role="tab">Historial</button>
+        <button class="tab" data-view="guia" role="tab">Guía</button>
+      </div>
+    </nav>
+
+    <main>
+
+      <!-- ═══════════════════ RESUMEN ═══════════════════ -->
+      <section class="view active" id="v-resumen">
+        <div class="page-head">
+          <div>
+            <h2>Resumen general</h2>
+            <p id="res-fuente" class="small"></p>
+          </div>
+          <div class="btn-row" data-downloads></div>
+        </div>
+        <div class="notice">
+          Todas las asignaciones generadas tienen carácter de <b>propuesta</b> y están sujetas a revisión y aprobación académica.
+          Las valoraciones distinguen requisitos <b>acreditados</b>, <b>no acreditados</b> e <b>información insuficiente</b>.
+          <span id="res-fase7-note" style="display:none"> · <b>Fase 7 activa:</b> continuidad 2026-II y progresión PPI aplicadas.</span>
+        </div>
+        <!-- Indicadores Fase 7 -->
+        <div class="ind-row" id="ind-fase7" style="display:none"></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="grid g2" style="margin-bottom:18px">
+          <div class="card">
+            <div class="card-h"><h3>Asignaturas por componente</h3></div>
+            <div class="card-b" id="res-comp"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Estado de asignación</h3></div>
+            <div class="card-b" id="res-estado"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h3>Distribución por programa académico</h3>
+            <div class="legend">
+              <span><i class="c-prop"></i>Propuesta</span>
+              <span><i class="c-aprob"></i>Aprobada</span>
+              <span><i class="c-valid"></i>Pend. validación</span>
+              <span><i class="c-pend"></i>Por designar</span>
+              <span><i class="c-sinp"></i>Perfil n/d</span>
+              <span><i class="c-dir"></i>Pend. Director</span>
+            </div>
+          </div>
+          <div class="table-wrap"><table class="t" id="res-prog"></table></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ ASIGNACIÓN ═══════════════════ -->
+      <section class="view" id="v-asignacion">
+        <div class="page-head">
+          <div>
+            <h2>Asignación docente por programa</h2>
+            <p>Seleccione un programa y componente. Pulse una asignatura para ver el perfil requerido, candidatos y justificación.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="filters">
+            <label class="f">Programa académico<select class="inp" id="f-prog"></select></label>
+            <label class="f">Componente<select class="inp" id="f-comp">
+              <option value="">Todos los componentes</option>
+              <option>Pedagógico</option>
+              <option>Didáctica de las Disciplinas</option>
+              <option>Práctica Pedagógica Investigativa</option>
+            </select></label>
+            <label class="f">Plan de estudios<select class="inp" id="f-plan">
+              <option value="">Todos los planes</option>
+              <option>Plan de transición</option>
+              <option>Plan anterior</option>
+            </select></label>
+            <label class="f">Estado<select class="inp" id="f-est"></select></label>
+            <label class="f">Tipo de asignación (Fase 7)<select class="inp" id="f-tipo7">
+              <option value="">Todos</option>
+              <option value="continuidad">Continuidad</option>
+              <option value="progresión">Progresión PPI</option>
+              <option value="nueva">Nueva asignación</option>
+              <option value="pendiente">Pendiente</option>
+            </select></label>
+            <label class="f">Buscar (profesor, programa o asignatura)<input class="inp" id="f-q" type="search" placeholder="Escriba para filtrar…"></label>
+          </div>
+          <div class="toolbar">
+            <span class="muted small" id="asig-count"></span>
+            <div class="btn-row" data-downloads></div>
+          </div>
+          <div class="table-wrap table-desktop"><table class="t" id="asig-table"></table></div>
+          <div class="rows-mobile" id="asig-mobile"></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ COMPARATIVO 2026-II / 2027-I (FASE 7) ═══════════════════ -->
+      <section class="view" id="v-comparativo">
+        <div class="page-head">
+          <div>
+            <h2>Comparativo 2026-II / 2027-I</h2>
+            <p>Análisis de continuidad, progresión PPI y cambios de asignación respecto al período anterior.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-dl-comp">Descargar Excel comparativo</button>
+          </div>
+        </div>
+
+        <div id="comp-sin-historico" class="notice info" style="display:none">
+          Para ver el comparativo, cargue el archivo <b>«Asignación Docente 2026-2»</b> en la sección <b>Archivos y configuración → D. Asignación histórica 2026-II</b>.
+        </div>
+
+        <div id="comp-contenido" style="display:none">
+          <!-- Indicadores de continuidad -->
+          <div class="grid g3" style="margin-bottom:18px">
+            <div class="kpi" style="--k:var(--ok)">
+              <div class="lbl">Con continuidad 2026-II</div>
+              <div class="val" id="ind-cont">—</div>
+              <div class="sub">docentes confirmados</div>
+            </div>
+            <div class="kpi" style="--k:var(--primary)">
+              <div class="lbl">Progresión PPI</div>
+              <div class="val" id="ind-prog">—</div>
+              <div class="sub">avances de nivel propuestos</div>
+            </div>
+            <div class="kpi" style="--k:var(--warn)">
+              <div class="lbl">No asignados 2026-II</div>
+              <div class="val" id="ind-noasig">—</div>
+              <div class="sub">sin propuesta para 2027-I</div>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="card">
+            <div class="filters" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr))">
+              <label class="f">Programa<select class="inp" id="comp-prog"><option value="">Todos</option></select></label>
+              <label class="f">Componente<select class="inp" id="comp-comp">
+                <option value="">Todos</option>
+                <option>Pedagógico</option>
+                <option>Didáctica de las Disciplinas</option>
+                <option>Práctica Pedagógica Investigativa</option>
+              </select></label>
+              <label class="f">Tipo<select class="inp" id="comp-tipo">
+                <option value="">Todos</option>
+                <option value="continuidad">Continuidad</option>
+                <option value="progresión">Progresión PPI</option>
+                <option value="nueva">Nueva asignación</option>
+                <option value="pendiente">Pendiente</option>
+              </select></label>
+            </div>
+            <div class="table-wrap">
+              <table class="t" id="comp-table">
+                <thead><tr>
+                  <th>Programa</th>
+                  <th>Componente</th>
+                  <th>Asignatura 2026-II</th>
+                  <th>Docente 2026-II</th>
+                  <th>Asignatura 2027-I</th>
+                  <th>Docente propuesto 2027-I</th>
+                  <th>Tipo</th>
+                  <th>Perfil</th>
+                  <th>Carga total</th>
+                  <th>Estado</th>
+                  <th>Observaciones</th>
+                </tr></thead>
+                <tbody id="comp-tbody"><tr><td colspan="11" class="empty">Cargue el archivo de asignación 2026-II para ver el comparativo.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:18px">
+            <div class="card-h"><h3>No asignados 2026-II</h3><span class="small muted" id="na-count"></span></div>
+            <div class="notice info" style="margin:16px 20px 0">Profesores que orientaron una asignatura de los tres componentes en 2026-II y que no tienen continuidad ni progresión propuesta en 2027-I, con la causa verificable. Ausencia de oferta no se califica como incumplimiento del profesor.</div>
+            <div class="table-wrap">
+              <table class="t">
+                <thead><tr><th>Programa</th><th>Profesor 2026-II</th><th>Asignatura 2026-II</th><th>Asignatura evaluada 2027-I</th><th>Causa</th><th>Detalle</th></tr></thead>
+                <tbody id="na-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ EXCEPCIONES PPI (FASE 7) ═══════════════════ -->
+      <section class="view" id="v-excepciones">
+        <div class="page-head">
+          <div>
+            <h2>Excepciones PPI – Autorización del Director</h2>
+            <p>Módulo restringido. Las asignaciones excepcionales de PPI a docentes de otra disciplina requieren decisión expresa del Director del Departamento de Pedagogía y Didáctica.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-dl-exc">Descargar reporte excepciones</button>
+          </div>
+        </div>
+
+        <div id="exc-ro-notice" class="notice info hidden">
+          El registro de autorizaciones excepcionales está reservado al Administrador. Usted puede consultar el historial de decisiones.
+        </div>
+
+        <div class="notice" style="border-color:var(--warn);background:var(--warn-soft)">
+          <b>Requisito legal:</b> Cualquier asignación excepcional a un docente cuyo pregrado no corresponde al programa de licenciatura de destino requiere
+          <b>decisión expresa del Director del Departamento</b>, debidamente registrada con: nombre del docente, título de pregrado, programa, nivel de PPI,
+          justificación académica, fecha, responsable y decisión. La excepción aplica únicamente a la asignación evaluada.
+        </div>
+
+        <!-- Formulario de registro (solo admin/coordinador) -->
+        <div class="card" id="exc-form-card">
+          <div class="card-h"><h3>Registrar nueva autorización excepcional</h3></div>
+          <div class="card-b">
+            <div class="grid g2" style="gap:14px;margin-bottom:16px">
+              <label class="f">Docente (elija de la base de profesores)<input class="inp" id="exc-docente" list="exc-docentes" placeholder="Escriba el nombre y elija una opción" autocomplete="off"><datalist id="exc-docentes"></datalist></label>
+              <label class="f">Título de pregrado<input class="inp" id="exc-titulo" placeholder="Se completa al elegir el docente" readonly></label>
+              <label class="f">Programa de licenciatura de destino<select class="inp" id="exc-programa"><option value="">Seleccione…</option></select></label>
+              <label class="f">Nivel PPI<select class="inp" id="exc-nivel">
+                <option value="">Seleccione…</option>
+                <option>PPI I</option><option>PPI II</option><option>PPI III</option>
+                <option>PPI IV</option><option>PPI V</option><option>PPI VI</option>
+              </select></label>
+              <label class="f" style="grid-column:1/-1">Justificación académica<textarea class="inp" id="exc-justificacion" rows="3" placeholder="Descripción de la justificación académica para la asignación excepcional…" style="resize:vertical"></textarea></label>
+              <label class="f">Nombre del Director que autoriza<input class="inp" id="exc-director" placeholder="Nombre completo del Director"></label>
+              <label class="f">Fecha de la decisión<input class="inp" type="date" id="exc-fecha"></label>
+              <label class="f">Decisión<select class="inp" id="exc-decision">
+                <option value="">Seleccione…</option>
+                <option value="autorizada">Autorizada</option>
+                <option value="negada">Negada</option>
+              </select></label>
+            </div>
+            <div class="btn-row">
+              <button class="btn primary" id="btn-exc-registrar">Registrar autorización</button>
+              <button class="btn" id="btn-exc-limpiar">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de excepciones -->
+        <div class="card">
+          <div class="card-h"><h3>Historial de autorizaciones excepcionales PPI</h3><span class="small muted" id="exc-count"></span></div>
+          <div class="table-wrap">
+            <table class="t" id="exc-table">
+              <thead><tr>
+                <th>Fecha</th>
+                <th>Docente</th>
+                <th>Pregrado</th>
+                <th>Programa destino</th>
+                <th>Nivel PPI</th>
+                <th>Justificación</th>
+                <th>Director</th>
+                <th>Decisión</th>
+                <th>Registrado por</th>
+              </tr></thead>
+              <tbody id="exc-tbody"><tr><td colspan="9" class="empty">No hay autorizaciones registradas.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ DOCENTES ═══════════════════ -->
+      <section class="view" id="v-docentes">
+        <div class="page-head">
+          <div>
+            <h2>Docentes</h2>
+            <p>Carga institucional total (máx. 8 h en toda la Universidad) y búsqueda en la base de profesores.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="filters" style="grid-template-columns: 2fr 1fr 1fr">
+            <label class="f">Buscar profesor<input class="inp" id="d-q" type="search" placeholder="Nombre, título o institución…"></label>
+            <label class="f">Mostrar<select class="inp" id="d-scope">
+              <option value="asig">Docentes con asignaturas</option>
+              <option value="todos">Toda la base de profesores</option>
+            </select></label>
+            <label class="f">Estado BDC<select class="inp" id="d-bdc">
+              <option value="">Todos</option>
+              <option>Cumple Requisitos</option>
+              <option>Cumple por Aval</option>
+              <option>En Verificación de requisitos</option>
+              <option>No Cumple Requisitos</option>
+            </select></label>
+          </div>
+          <div class="toolbar"><span class="muted small" id="doc-count"></span></div>
+          <div class="table-wrap"><table class="t" id="doc-table"></table></div>
+          <div class="pager" id="doc-pager"></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ ARCHIVOS ═══════════════════ -->
+      <section class="view" id="v-archivos">
+        <div class="page-head">
+          <div>
+            <h2>Archivos, configuración y respaldo</h2>
+            <p>Cargue, actualice o reemplace los archivos de entrada sin modificar el código. El análisis se recalcula automáticamente.</p>
+          </div>
+        </div>
+
+        <div id="arch-ro" class="notice info hidden">Su rol permite consultar los archivos cargados. La carga y configuración están reservadas al Administrador.</div>
+
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-h"><h3>Diagnóstico de archivos</h3><span class="small muted">Faltantes, duplicados o inconsistentes</span></div>
+          <div class="card-b"><div class="diag" id="diag"></div></div>
+        </div>
+
+        <div class="grid g2" style="margin-bottom:18px">
+          <div class="card">
+            <div class="card-h"><h3>A. Planes de estudio (.xlsx)</h3></div>
+            <div class="card-b">
+              <div class="drop" data-drop="planes" tabindex="0">
+                <b>Arrastre aquí o pulse para seleccionar</b>
+                <span class="small muted">Columnas: Nombre del programa, Asignatura, Número de créditos, Prerrequisitos, Componente, Semestre (opcional), Código (opcional).</span>
+              </div>
+              <div class="file-list" id="fl-planes"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>B. Perfiles docentes (.docx)</h3></div>
+            <div class="card-b">
+              <div class="drop" data-drop="perfiles" tabindex="0">
+                <b>Arrastre aquí o pulse para seleccionar (varios)</b>
+                <span class="small muted">Un documento por programa con el encabezado «LICENCIATURA EN …».</span>
+              </div>
+              <div class="file-list" id="fl-perfiles"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>C1. Profesores – formación académica (.xlsx)</h3></div>
+            <div class="card-b">
+              <div class="drop" data-drop="formacion" tabindex="0">
+                <b>Arrastre aquí o pulse para seleccionar</b>
+                <span class="small muted">Columnas: IDENTIFICACIÓN, NOMBRE, ESTADO ACTUAL, NIVEL DE FORMACIÓN, PROGRAMA, INSTITUCIÓN, GRADUADO, FECHA DE TERMINACIÓN.</span>
+              </div>
+              <div class="file-list" id="fl-formacion"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>C2. Profesores – experiencia (.xlsx)</h3></div>
+            <div class="card-b">
+              <div class="drop" data-drop="experiencia" tabindex="0">
+                <b>Arrastre aquí o pulse para seleccionar</b>
+                <span class="small muted">Columnas: IDENTIFICACIÓN, NOMBRE, EMPRESA, TIPO DE EXPERIENCIA, FECHA INICIO, FECHA FIN, DURACIÓN.</span>
+              </div>
+              <div class="file-list" id="fl-experiencia"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ░░░ NUEVA SECCIÓN FASE 7 ░░░ -->
+        <div class="card" style="margin-bottom:18px;border-color:rgba(196,135,30,.35)">
+          <div class="card-h" style="background:var(--accent-soft)">
+            <h3 style="color:var(--accent)">D. Asignación histórica 2026-II · <span class="badge-new">Fase 7</span></h3>
+            <span class="small muted">Antecedente histórico para análisis de continuidad y progresión PPI.</span>
+          </div>
+          <div class="card-b">
+            <div class="notice" style="border-color:var(--accent);background:var(--accent-soft);margin-bottom:14px;font-size:13px">
+              <b>Formato requerido:</b> El archivo debe tener el nombre exacto <code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px">Asignación Docente 2026-2</code> o similar.
+              Columnas esperadas: <b>PERIODO, TDOC, NUMERO, DOCENTE, COD. MAT, ASIGNATURA, ALIAS, GRUPO, TIPO REG., HORARIO, CUPO, MATRIC.</b>
+              El archivo puede tener varias hojas (una por programa + CONSOLIDADO). Se leerá la hoja <b>CONSOLIDADO</b> si existe; en su defecto, todas las hojas.
+              Este archivo <em>no acredita por sí solo idoneidad</em> del profesor ni carga vigente en 2027-I; es únicamente un antecedente histórico.
+            </div>
+            <div class="drop historico-drop" data-drop="historico" tabindex="0">
+              <b>Arrastre aquí el archivo «Asignación Docente 2026-2.xlsx» o pulse para seleccionar</b>
+              <span class="small muted">Formato .xlsx · Hojas por programa o hoja CONSOLIDADO · Columna DOCENTE requerida</span>
+            </div>
+            <div class="file-list" id="fl-historico"></div>
+
+            <!-- Control de carga institucional total -->
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+              <h4 style="font-size:14px;margin-bottom:10px;color:var(--text-2)">Actualización de carga académica total 2027-I en toda la Universidad</h4>
+              <p class="small muted" style="margin-bottom:12px">
+                El tope de <b>8 horas</b> es la carga académica <b>total institucional</b> del docente en toda la Universidad del Magdalena, incluyendo horas de todas las facultades, centros y departamentos.
+                Si dispone de un archivo con la carga comprometida de otros departamentos, cárguelo aquí para un control preciso.
+              </p>
+              <div class="drop" data-drop="carga_inst" tabindex="0">
+                <b>Arrastre aquí el archivo de carga institucional 2027-I (opcional)</b>
+                <span class="small muted">Columnas: IDENTIFICACIÓN o NOMBRE del docente, HORAS comprometidas en otras unidades académicas</span>
+              </div>
+              <div class="file-list" id="fl-carga_inst"></div>
+            </div>
+          </div>
+        </div>
+        <!-- ░░░ FIN FASE 7 ░░░ -->
+
+        <input type="file" id="file-input" class="hidden" multiple>
+
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>Configuración de la asignación</h3></div>
+            <div class="card-b" id="cfg"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Respaldo y restauración</h3></div>
+            <div class="card-b" id="backup"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px" id="users-card">
+          <div class="card-h">
+            <h3>Usuarios y control de acceso</h3>
+            <button class="btn sm primary" id="btn-add-user">Agregar usuario</button>
+          </div>
+          <div class="table-wrap"><table class="t" id="users-table"></table></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ CALIDAD ═══════════════════ -->
+      <section class="view" id="v-calidad">
+        <div class="page-head">
+          <div>
+            <h2>Validación y control de calidad</h2>
+            <p>Verificaciones automáticas realizadas antes de presentar y exportar los resultados.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:18px"><div class="table-wrap"><table class="t" id="qa-table"></table></div></div>
+        <div class="grid g2">
+          <div class="card"><div class="card-h"><h3>Asignaturas con clasificación por revisar</h3></div><div class="table-wrap"><table class="t" id="qa-rev"></table></div></div>
+          <div class="card"><div class="card-h"><h3>Alertas en documentos de perfiles</h3></div><div class="table-wrap"><table class="t" id="qa-perf"></table></div></div>
+        </div>
+        <!-- Alertas Fase 7 -->
+        <div class="card" style="margin-top:18px">
+          <div class="card-h"><h3>Alertas Fase 7 <span class="badge-new">Nuevo</span></h3></div>
+          <div class="card-b" id="qa-fase7"><p class="muted small">Sin datos de asignación histórica cargados.</p></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ HISTORIAL ═══════════════════ -->
+      <section class="view" id="v-historial">
+        <div class="page-head">
+          <div>
+            <h2>Historial de modificaciones</h2>
+            <p>Registro de trazabilidad: quién modificó qué, cuándo y por qué.</p>
+          </div>
+          <div class="btn-row">
+            <input class="inp" id="h-q" type="search" placeholder="Filtrar historial…" style="width:240px">
+            <button class="btn" id="btn-log-xlsx">Descargar historial (Excel)</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table class="t" id="log-table"></table></div>
+          <div class="pager" id="log-pager"></div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════ GUÍA ═══════════════════ -->
+      <section class="view" id="v-guia">
+        <div class="card"><div class="card-b guide" id="guia"></div></div>
+      </section>
+
+    </main>
+
+    <!-- Footer de la app -->
+    <footer class="app-footer">
+      <div class="app-footer-in">
+        <span>Sistema Institucional de Asignación Docente · <strong>Versión Fase 7 (2026-II / 2027-I)</strong></span>
+        <span>Facultad de Educación · <strong>Universidad del Magdalena</strong></span>
+      </div>
+    </footer>
+  </div><!-- /app -->
+
+  <!-- Panel lateral de detalle -->
+  <div class="drawer-bg" id="drawer-bg"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-label="Detalle de asignatura">
+    <div class="drawer-h">
+      <div id="dr-head"></div>
+      <button class="btn sm x" id="dr-close">Cerrar ✕</button>
+    </div>
+    <div class="drawer-b" id="dr-body"></div>
+  </aside>
+
+  <!-- Notificaciones y carga -->
+  <div class="toast-box" id="toasts"></div>
+  <div class="loading hidden" id="loading">
+    <div><div class="spinner"></div><span id="loading-txt">Procesando…</span></div>
+  </div>
+
+  <!-- Librerías -->
+  <script src="lib/jszip.min.js"></script>
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="lib/exceljs.min.js"></script>
+
+  <!-- Motor y lógica -->
+  <script src="js/engine.js"></script>
+  <script src="js/reportes.js"></script>
+  <script src="data/datos_base.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/fase7.js"></script>
+  <script>
+    (function () {
+      var tog = document.getElementById('auth-pass-toggle');
+      var inp = document.getElementById('auth-pass');
+      if (tog && inp) {
+        tog.addEventListener('click', function () {
+          var visible = inp.type === 'text';
+          inp.type = visible ? 'password' : 'text';
+          tog.textContent = visible ? '👁' : '🙈';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
