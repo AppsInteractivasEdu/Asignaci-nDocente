@@ -399,6 +399,11 @@
     S.f = { prog: $('#f-prog').value, comp: $('#f-comp').value, plan: $('#f-plan').value, est: $('#f-est').value, tipo: $('#f-tipo7').value, q: $('#f-q').value };
     renderDescargas(); renderAsignacion();
   }));
+  $('#btn-limpiar-filtros').onclick = () => {
+    ['#f-prog', '#f-comp', '#f-plan', '#f-est', '#f-tipo7', '#f-q'].forEach(id => { $(id).value = ''; });
+    S.f = { prog: '', comp: '', plan: '', est: '', tipo: '', q: '' };
+    renderDescargas(); renderAsignacion();
+  };
   let qT;
   $('#f-q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { S.f.q = $('#f-q').value; renderAsignacion(); }, 150); });
 
