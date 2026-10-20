@@ -247,7 +247,16 @@
       loading(true, 'Cargando datos…');
       await tick();
       const f = await Store.get('fuentes');
-      if (f) { S.fuentes = f; S.fuentesMod = true; S.archivos = (await Store.get('archivos')) || []; }
+      if (f) {
+        S.fuentes = f; S.fuentesMod = true; S.archivos = (await Store.get('archivos')) || [];
+        const hb = window.DATOS_BASE && window.DATOS_BASE.fuentes.historico7;
+        if (hb && !f.historico7 && !f.historicoEliminado) {
+          f.historico7 = JSON.parse(JSON.stringify(hb));
+          const reg = window.DATOS_BASE.archivos.find(a => /hist[oó]rica/.test(a.tipo));
+          if (reg && !S.archivos.some(a => /hist[oó]rica/.test(a.tipo))) S.archivos.push(Object.assign({}, reg));
+          await Store.set('fuentes', f); await Store.set('archivos', S.archivos);
+        }
+      }
       else if (window.DATOS_BASE) { S.fuentes = JSON.parse(JSON.stringify(window.DATOS_BASE.fuentes)); S.archivos = window.DATOS_BASE.archivos.slice(); }
       else S.fuentes = { planes: [], perfilDocs: [], formacion: null, experiencia: null };
       S.overrides = (await Store.get('overrides')) || {};
@@ -815,7 +824,7 @@
     else if (a.tipo === 'Perfiles docentes') S.fuentes.perfilDocs = S.fuentes.perfilDocs.filter(p => p.archivo !== a.nombre);
     else if (/formaci/.test(a.tipo)) S.fuentes.formacion = null;
     else if (/experiencia/.test(a.tipo)) S.fuentes.experiencia = null;
-    else if (/hist[oó]rica/.test(a.tipo)) S.fuentes.historico7 = null;
+    else if (/hist[oó]rica/.test(a.tipo)) { S.fuentes.historico7 = null; S.fuentes.historicoEliminado = true; }
     else if (/Carga institucional/.test(a.tipo)) S.fuentes.cargaInst7 = null;
     S.archivos.splice(i, 1);
     S.fuentesMod = true;
