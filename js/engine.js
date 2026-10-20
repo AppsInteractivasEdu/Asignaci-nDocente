@@ -721,7 +721,7 @@
   function evalPregrado(req, prof) {
     const pre = req.pregrado;
     const tits = prof.titulos.filter(t => t.nivel === 'Profesional');
-    if (!pre.items.length && !pre.alt) return { s: 'I', det: 'El perfil no define la formación de pregrado.' };
+    if (!pre.items.length && !pre.alt) return { s: 'I', det: 'El perfil no define la formación de pregrado.', sinReq: true };
     let best = null;
     const consider = (s, t, det) => {
       const rank = { A: 4, C: 3, F: 2, I: 1, N: 0 };
@@ -841,9 +841,8 @@
     prepararProfesor(prof);
     const req = requisitos(perfil);
     const pre = evalPregrado(req, prof);
-    if (rapido && pre.s === 'N') return { tier: 0, pre };
     const pos = evalPosgrado(req, prof);
-    if (rapido && pos.s === 'N') return { tier: 0, pre, pos };
+    if (rapido && (pos.s === 'N' || (pre.s === 'N' && pos.s !== 'A' && pos.s !== 'F'))) return { tier: 0, pre, pos };
     const exp = evalExperiencia(req, prof);
     const bdc = evalBDC(prof);
     const inv = prof.exp && prof.exp.investigacion > 0
@@ -855,9 +854,13 @@
 
     let tier;
     const hard = [pre.s, pos.s, exp.s, bdc.s];
-    if (pre.s === 'N' || pos.s === 'N') tier = 0;
+    let soloPosgrado = false;
+    if (pos.s === 'N') tier = 0;
     else if (bdc.s === 'N' && cfg.excluirNoCumpleBDC) tier = 0;
     else if (exp.s === 'N') tier = 0;
+    else if (pre.s === 'N') { // sin pregrado afín: solo se considera si el posgrado es afín (revisión manual del Director)
+      if (pos.s === 'A' || pos.s === 'F') { tier = 1; soloPosgrado = true; } else tier = 0;
+    }
     else if (hard.every(s => s === 'A' || s === 'C')) tier = 3;           // cumple requisitos verificables
     else if (hard.every(s => s !== 'N') && !hard.includes('I')) tier = 2; // cumple con afinidad (validar)
     else if (hard.every(s => s !== 'N')) tier = 1;                         // información insuficiente
@@ -875,11 +878,12 @@
     score += inv.s === 'A' ? 5 + Math.min(prof.exp.investigacion, 5) : 0;
     score += bdc.s === 'A' ? 2 : 0;
     score = Math.round(Math.min(score, 100));
-    return { tier, score, pre, pos, exp, expEsp, inv, comp, bdc, otros };
+    return { tier, score, pre, pos, exp, expEsp, inv, comp, bdc, otros, soloPosgrado };
   }
 
   function nivelCorrespondencia(ev) {
     if (!ev) return '';
+    if (ev.soloPosgrado) return 'Pregrado no afín · posgrado afín (revisión del Director)';
     if (ev.tier === 3) return ev.score >= 70 ? 'Alta' : ev.score >= 50 ? 'Media-alta' : 'Media';
     if (ev.tier === 2) return 'Media (con afinidad por validar)';
     if (ev.tier === 1) return 'Por verificar (información insuficiente)';
@@ -1051,22 +1055,23 @@
 
     // 2) automáticas: primero las asignaturas con menos candidatos idóneos
     const auto = ds.cursos.filter(c => { const r = res.get(c.id); return !r.manual && c.perfilId && r.enAlcance; });
-    const nIdoneos = c => (evalPorPerfil.get(c.perfilId) || { lista: [] }).lista.filter(x => x.ev.tier === 3).length;
+    // Criterio previo: afinidad del pregrado con la asignatura. El posgrado solo habilita revisión manual del Director.
+    const preAfin = x => x.ev.pre.s === 'A' || !!x.ev.pre.sinReq;
+    const posAfin = x => !!x.ev.pos && (x.ev.pos.s === 'A' || x.ev.pos.s === 'F');
+    const tituloPre = id => { const p = profPorId.get(id); const t = p && p.titulos.find(y => y.nivel === 'Profesional'); return t ? t.titulo : ''; };
+    const nIdoneos = c => (evalPorPerfil.get(c.perfilId) || { lista: [] }).lista.filter(x => x.ev.tier === 3 && preAfin(x)).length;
     auto.sort((a, b) => nIdoneos(a) - nIdoneos(b) || horasDe(b) - horasDe(a));
 
     // ---- Fase 7: historial 2026-II, carga institucional total y requisito de pregrado en PPI ----
     const f7 = fase7 || {};
     const hist = f7.hist || [];
     const ext = f7.cargaExt || new Map();
-    const autor = f7.autorizaciones || [];
     const histPorProg = new Map();
     hist.forEach(h => { if (!histPorProg.has(h.progN)) histPorProg.set(h.progN, []); histPorProg.get(h.progN).push(h); });
     const horasMax = cfg.maxHoras === 8 ? 'ocho (8)' : String(cfg.maxHoras);
     const extDe = id => ext.get(cedula(id)) || 0;
     const cargaTot = id => (carga.get(id) || 0) + extDe(id);
     const esPPIc = c => c.componente === COMP.PPI;
-    const autorizado = (id, c) => { const l = nivelPPI(c.asignatura); return autor.some(a => a.docenteId === id && a.progN === progN(c.programa) && a.nivel === l); };
-    const preOk = (x, c) => x.ev.pre.s === 'A' || autorizado(x.id, c);
     const mismaAsig = (c, h) => {
       if (esPPIc(c)) return h.nivel != null && h.nivel === nivelPPI(c.asignatura);
       const a = tokens(c.asignatura);
@@ -1112,17 +1117,24 @@
         const x = prof ? info.lista.find(y => y.id === o.id) : null;
         if (!prof) { f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'Pendiente de validación: el profesor no figura en la base de formación y experiencia cargada' }); continue; }
         if (!x) { f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'incumplimiento de ' + incumple(perfilPorId.get(c.perfilId), prof) }); continue; }
+        if (!preAfin(x)) {
+          const pg = tituloPre(o.id) || 'sin pregrado registrado';
+          if (posAfin(x)) { f.dir.push(x); f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'su pregrado (' + pg + ') no es afín con la asignatura; se evaluó su posgrado, que es afín, y queda para revisión manual del Director' }); }
+          else f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'su pregrado (' + pg + ') no es afín con la asignatura' });
+          continue;
+        }
         if (x.ev.tier < 3) { f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'Pendiente de validación: requisitos del perfil con afinidad por validar o información insuficiente' }); continue; }
-        if (ppi && !preOk(x, c)) { f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'su pregrado no corresponde al programa de destino; no se asigna automáticamente y requiere decisión expresa del Director del Departamento' }); continue; }
         if (!cabe(x)) { f.bloqueos.push({ nombre: nom, t: o.t, motivo: 'superaría el límite máximo de ' + horasMax + ' horas de carga académica total en la Universidad del Magdalena (' + (cargaTot(x.id) + h) + ' h proyectadas)' }); continue; }
         elegible = x; break;
       }
       if (pasada === 2 && !elegible) {
         const cand = info.lista.filter(x => x.ev.tier >= 1 && cabe(x));
-        if (ppi) {
-          elegible = cand.find(x => preOk(x, c)) || null;
-          if (!elegible) { f.dir = cand.filter(x => x.ev.pre.s === 'F' || x.ev.pre.s === 'C'); f.doc = cand.filter(x => x.ev.pre.s === 'I'); }
-        } else elegible = cand[0] || null;
+        elegible = cand.find(preAfin) || null;
+        if (!elegible) {
+          const ya = new Set(f.dir.map(x => x.id));
+          cand.filter(x => !preAfin(x) && x.ev.pre.s !== 'I' && posAfin(x) && !ya.has(x.id)).forEach(x => f.dir.push(x));
+          f.doc = cand.filter(x => x.ev.pre.s === 'I' && !x.ev.pre.sinReq);
+        }
       }
       if (elegible) { r.docenteId = elegible.id; add(elegible.id, c); }
     }));
@@ -1137,12 +1149,13 @@
       if (c.perfilNota) r.observaciones.push(c.perfilNota);
       if (perfil && perfil.alertas.length) r.observaciones.push('Alerta del perfil: ' + perfil.alertas.join(' '));
       if (info) {
-        r.alternativas = info.lista.filter(x => x.id !== r.docenteId).slice(0, cfg.maxAlternativas).map(x => ({
-          id: x.id, nombre: profPorId.get(x.id).nombre, score: x.ev.score, tier: x.ev.tier, carga: carga.get(x.id) || 0,
-        }));
+        const otros = info.lista.filter(x => x.id !== r.docenteId);
+        const mapAlt = x => ({ id: x.id, nombre: profPorId.get(x.id).nombre, score: x.ev.score, tier: x.ev.tier, carga: carga.get(x.id) || 0, pregrado: tituloPre(x.id) });
+        r.alternativas = otros.filter(preAfin).slice(0, cfg.maxAlternativas).map(mapAlt);
+        r.revisionDirector = otros.filter(x => !preAfin(x) && x.ev.pre.s !== 'I' && posAfin(x)).slice(0, cfg.maxAlternativas).map(mapAlt);
         r.conteo = info.conteo;
-        r.nIdoneos = info.lista.filter(x => x.ev.tier === 3).length;
-        r.nCandidatos = info.lista.length;
+        r.nIdoneos = info.lista.filter(x => x.ev.tier === 3 && preAfin(x)).length;
+        r.nCandidatos = info.lista.filter(preAfin).length;
       }
       const prof = r.docenteId ? profPorId.get(r.docenteId) : null;
       if (prof && perfil) r.ev = evaluar(perfil, prof, cfg);
@@ -1183,12 +1196,12 @@
         r.observaciones.unshift('El ' + c.plan.toLowerCase() + ' no está incluido en la asignación automática (configuración). ' + (r.nIdoneos ? r.nIdoneos + ' profesores cumplen los requisitos verificables.' : ''));
         return;
       }
-      if (!prof && esPPIc(c) && f.dir.length) {
+      if (!prof && f.dir.length) {
         r.estado = EST.DIR;
-        r.observaciones.unshift('No se asigna automáticamente; requiere decisión expresa del Director del Departamento. Candidatos con requisitos verificables pero con pregrado de otra disciplina o por vía alterna: ' + f.dir.slice(0, 5).map(x => profPorId.get(x.id).nombre).join('; ') + '. Registre la decisión en el módulo «Excepciones PPI».', ...obsBloqueos());
+        r.observaciones.unshift('Ningún docente con pregrado afín a la asignatura está disponible. No se asigna automáticamente: candidatos con posgrado afín que deben ser revisados manualmente por el Director del Departamento: ' + f.dir.slice(0, 5).map(x => profPorId.get(x.id).nombre + ' (pregrado: ' + (tituloPre(x.id) || 'no registrado') + ')').join('; ') + '. Si el Director lo autoriza, asígnelo desde la matriz de correspondencia.', ...obsBloqueos());
         return;
       }
-      if (!prof && esPPIc(c) && f.doc.length) {
+      if (!prof && f.doc.length) {
         r.estado = EST.VALDOC;
         r.observaciones.unshift('Pendiente de validación documental: no es posible comprobar el título de pregrado de ' + f.doc.slice(0, 5).map(x => profPorId.get(x.id).nombre).join('; ') + '.', ...obsBloqueos());
         return;
@@ -1219,7 +1232,7 @@
       const obsF7 = [];
       if (f.tipo === 'continuidad' && ev.tier === 3) obsF7.push('Se propone continuidad desde 2026-II por cumplimiento verificado del perfil requerido.');
       if (f.tipo === 'progresión' && ev.tier === 3) obsF7.push('Se propone progresión de PPI ' + ROMANO(f.nivelOrigen) + ' a PPI ' + ROMANO(f.nivelDestino) + ', con verificación satisfactoria del perfil de destino.');
-      if (esPPIc(c) && autorizado(prof.id, c)) obsF7.push('Excepción autorizada por el Director del Departamento (ver módulo «Excepciones PPI»); se verificaron los demás requisitos del perfil.');
+      if (r.manual && ev.pre.s !== 'A') obsF7.push('Asignación manual con pregrado no afín (' + (tituloPre(prof.id) || 'no registrado') + '): debe constar la decisión del Director del Departamento en el motivo registrado.');
       obsF7.push(...obsBloqueos());
       if (hist.length && !f7.cargaInstCargada) obsF7.push('Pendiente de validación: falta la carga académica 2027-I comprometida en otras unidades de la Universidad (carga total considerada: ' + f.cargaTotal + ' h, solo la de este análisis).');
       r.observaciones.unshift(...obsF7);

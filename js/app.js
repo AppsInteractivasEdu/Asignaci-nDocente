@@ -465,7 +465,8 @@
     h.push('<div class="card"><div class="card-h"><h3>Docente asignado</h3><div class="btn-row">' + acciones.join('') + '</div></div><div class="card-b">' +
       (prof ? '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:16px;font-weight:700">' + esc(prof.nombre) + (r.manual ? ' <span class="tag warn">asignación manual</span>' : '') + '</div><div class="small muted">' + esc(E.nivelCorrespondencia(r.ev)) + ' · puntaje ' + (r.ev ? r.ev.score : '—') + '/100</div></div>' +
         '<div class="small">Carga total: <b>' + carga + ' / ' + S.config.maxHoras + ' h</b> <span class="loadbar"><span class="' + (carga > S.config.maxHoras ? 'full' : '') + '" style="width:' + Math.min(100, carga / S.config.maxHoras * 100) + '%"></span></span></div></div>' +
-        '<p class="small" style="margin:10px 0 0">' + esc(E.resumenProfesor(prof)) + '</p>'
+        '<p class="small" style="margin:10px 0 0"><b>Pregrado:</b> ' + esc((prof.titulos.find(t => t.nivel === 'Profesional') || {}).titulo || 'no registrado') + ' — <b>' + esc(r.ev && r.ev.pre ? (r.ev.pre.s === 'A' ? 'afín con la asignatura' : r.ev.pre.s === 'N' ? 'no afín con la asignatura (requiere revisión del Director)' : r.ev.pre.s === 'I' && r.ev.pre.sinReq ? 'el perfil no exige un pregrado específico' : 'afinidad por validar') : '') + '</b></p>' +
+        '<p class="small" style="margin:6px 0 0">' + esc(E.resumenProfesor(prof)) + '</p>'
         : '<div style="font-size:16px;font-weight:700">Por designar</div>') +
       '</div></div>');
 
@@ -476,8 +477,7 @@
         '<div><b>Profesor(es) 2026-II de esta asignatura</b>' + esc((x.prev26 || []).join('; ') || '—') + '</div>' +
         '<div><b>Antecedente del docente propuesto</b>' + (x.origen ? esc(x.origen.asignatura + ' (' + x.origen.periodo + ')') : '—') + '</div>' +
         '<div><b>Carga total proyectada 2027-I</b>' + (x.cargaTotal != null ? x.cargaTotal + ' h (esta propuesta) ' + (x.cargaExt ? '· incluye ' + x.cargaExt + ' h de otras unidades' : '· sin carga externa registrada') : '—') + '</div>' +
-        (c.componente === E.COMP.PPI && x.preS ? '<div><b>Pregrado y programa de destino</b>' + esc(x.pregrado || '—') + ' · ' + esc({ A: 'Cumple', F: 'No cumple (afinidad)', C: 'No cumple (vía alterna)', N: 'No cumple', I: 'No verificable' }[x.preS] || '') + '</div>' : '') +
-        '</div></div></div>');
+        '</div>' + ((x.bloqueos || []).length ? '<ul class="obs" style="margin-top:8px">' + x.bloqueos.map(b => '<li><b>' + esc(b.nombre) + '</b> (' + esc(b.t) + ' desde 2026-II) no continúa: ' + esc(b.motivo) + '.</li>').join('') + '</ul>' : '') + '</div></div>');
     }
 
     // Observaciones
@@ -487,7 +487,8 @@
     if (perfil) {
       const cands = [];
       if (prof) cands.push({ p: prof, rol: r.manual ? 'Asignado' : 'Propuesto' });
-      r.alternativas.forEach((a, i) => { const p = profPorId().get(a.id); if (p) cands.push({ p, rol: 'Alternativa ' + (i + 1) }); });
+      r.alternativas.forEach((a, i) => { const p = profPorId().get(a.id); if (p) cands.push({ p, rol: 'Sugerido ' + (i + 1) + ' · pregrado afín' }); });
+      (r.revisionDirector || []).forEach((a, i) => { const p = profPorId().get(a.id); if (p && !cands.some(x => x.p.id === a.id)) cands.push({ p, rol: 'Revisión del Director ' + (i + 1) + ' · posgrado afín' }); });
       if (S.extraCand && S.extraCand.curso === id) S.extraCand.ids.forEach(pid => { const p = profPorId().get(pid); if (p && !cands.some(x => x.p.id === pid)) cands.push({ p, rol: 'Consultado' }); });
       const evs = cands.map(x => ({ x, ev: E.evaluar(perfil, x.p, S.config) }));
       const filasReq = [['Formación de pregrado', 'pre'], ['Formación posgradual', 'pos'], ['Experiencia docente', 'exp'], ['Experiencia específica', 'expEsp'], ['Experiencia investigativa', 'inv'], ['Competencias', 'comp'], ['Hoja de vida (BDC)', 'bdc']];
@@ -550,7 +551,7 @@
     if (!res.length) { box.innerHTML = '<div class="muted small">Sin coincidencias.</div>'; return; }
     box.innerHTML = res.map(p => {
       const ev = E.evaluar(perfil, p, S.config);
-      const lbl = ev.tier === 3 ? '<span class="chip st-aprob">Cumple requisitos verificables</span>' : ev.tier > 0 ? '<span class="chip st-valid">Por validar</span>' : '<span class="chip st-pend">No acredita requisitos obligatorios</span>';
+      const lbl = ev.soloPosgrado ? '<span class="chip st-dir">Pregrado no afín · revisión del Director</span>' : ev.tier === 3 ?'<span class="chip st-aprob">Cumple requisitos verificables</span>' : ev.tier > 0 ? '<span class="chip st-valid">Por validar</span>' : '<span class="chip st-pend">No acredita requisitos obligatorios</span>';
       return '<div class="cand"><div><div class="n">' + esc(p.nombre) + '</div><div class="small muted">' + esc((p.titulos.filter(t => t.nivel === 'Profesional')[0] || {}).titulo || 'Sin pregrado registrado') + ' · ' + esc(p.estadoBDC) + ' · carga ' + (S.an.carga.get(p.id) || 0) + ' h</div></div><div class="btn-row">' + lbl +
         '<button class="btn sm" data-ver="' + esc(p.id) + '">Ver en matriz</button><button class="btn sm" data-asg="' + esc(p.id) + '">Asignar</button></div></div>';
     }).join('');
@@ -567,6 +568,7 @@
     const nueva = cargaAct + r.horas;
     const avisos = [];
     if (!perfil) avisos.push('La asignatura no tiene perfil de referencia.');
+    else if (ev.pre && ev.pre.s !== 'A' && !ev.pre.sinReq) avisos.push('El pregrado del profesor NO es afín con la asignatura. Solo debe asignarse con la decisión expresa del Director del Departamento; regístrela en el motivo.');
     else if (ev.tier === 0) avisos.push('El profesor NO acredita los requisitos obligatorios verificables del perfil. La asignación quedará como «Pendiente de validación» y no podrá aprobarse.');
     else if (ev.tier < 3) avisos.push('El profesor tiene requisitos con afinidad por validar o información insuficiente; la asignación quedará «Pendiente de validación».');
     if (nueva > S.config.maxHoras) avisos.push('Con esta asignatura el profesor tendría ' + nueva + ' h, superando el tope de ' + S.config.maxHoras + ' h.');
@@ -1000,7 +1002,7 @@
       '<li><b>Fuente histórica.</b> En «Archivos y configuración → D» cargue «Asignación Docente 2026-2» (.xlsx). Se lee la hoja CONSOLIDADO (o todas las hojas) y se requieren las columnas <b>PROGRAMA, NUMERO (identificación), DOCENTE y ASIGNATURA</b>. Es un antecedente: no acredita idoneidad ni carga vigente en 2027-I.</li>' +
       '<li><b>Continuidad.</b> Si el profesor que orientó la asignatura en 2026-II acredita el perfil vigente y le queda carga, se propone de nuevo. Si no cumple, no se propone y la observación indica el requisito incumplido y su evidencia.</li>' +
       '<li><b>Progresión de PPI.</b> Quien orientó PPI I pasa a PPI II, y así hasta PPI VI / Práctica Profesional, que retorna a PPI I. La progresión tiene prioridad sobre repetir el nivel, pero nunca sobre la idoneidad ni sobre la carga.</li>' +
-      '<li><b>Pregrado en PPI.</b> Antes de cualquier otro requisito, el pregrado debe corresponder a la licenciatura de destino. Si es de otra disciplina, la asignatura queda «Pendiente de autorización del Director» y solo se asigna con una decisión registrada en la pestaña «Excepciones PPI».</li>' +
+      '<li><b>Pregrado primero (todos los componentes).</b> Antes de cualquier otro criterio se verifica que el pregrado del docente sea afín con la asignatura; solo esos docentes se proponen y se sugieren. Si ninguno está disponible, se evalúa el posgrado: esos docentes no se asignan directamente, la asignatura queda «Pendiente de autorización del Director» y se listan como «Revisión del Director» en el panel de detalle. Si el Director lo autoriza, se asigna manualmente desde allí.</li>' +
       '<li><b>Carga total.</b> El máximo de 8 horas es la carga del profesor en toda la Universidad. Cargue en «D» la carga 2027-I comprometida en otras unidades; sin ese archivo cada propuesta queda con la observación «Pendiente de validación».</li>' +
       '<li><b>Reportes.</b> El Excel consolidado y el de cada programa incluyen las hojas «COMPARATIVO 2026-II vs 2027-I», «NO ASIGNADOS 2026-II» y «AUTORIZACIONES PPI» (esta última cuando hay registros).</li></ul>' +
       '<h3>Criterios de evaluación</h3><p class="small">El sistema no asume que un profesor cumple un requisito solo por tener un título de nivel superior: contrasta la denominación del pregrado y el campo del posgrado con los exigidos por el perfil, calcula los años de docencia sin duplicar periodos simultáneos y verifica el estado de la hoja de vida. La experiencia específica, las competencias y la pertinencia de la investigación no se pueden comprobar con las bases de datos y se presentan como «información insuficiente», para verificarlas con soportes durante la revisión académica. No se inventan títulos ni experiencias: toda justificación cita los registros de los archivos.</p>';
