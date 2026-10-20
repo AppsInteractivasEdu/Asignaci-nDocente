@@ -1035,12 +1035,22 @@
   /* ================================================================== */
   /* Arranque                                                            */
   /* ================================================================== */
+  function ajustarEncabezadoFijo() {
+    const tb = document.querySelector('.topbar'), tabs = document.querySelector('.tabs');
+    if (tb && tabs) document.documentElement.style.setProperty('--sticky-top', (tb.offsetHeight + tabs.offsetHeight - 1) + 'px');
+  }
+  window.addEventListener('resize', ajustarEncabezadoFijo);
+  document.addEventListener('click', e => { if (e.target.closest('.tab')) setTimeout(ajustarEncabezadoFijo, 0); });
+  setTimeout(ajustarEncabezadoFijo, 300); setTimeout(ajustarEncabezadoFijo, 1500);
+
   window.AppBridge = { S, $, $$, esc, toast, loading, can, Store, registrar, irA, recalcular, descargar, abrirDetalle: id => abrirDetalle(id), chip: e => chip(e), compTag: c => compTag(c), corto };
   window.AppStore = Store;
   (async function boot() {
     await Store.open();
     S.users = (await Store.get('users')) || [];
     S.log = (await Store.get('log')) || [];
+    const base = (window.USUARIOS_BASE || []).filter(b => !S.users.some(u => u.usuario === b.usuario));
+    if (base.length) { S.users = S.users.concat(base.map(b => Object.assign({}, b))); await Store.set('users', S.users); }
     if (!S.users.length) return mostrarAuth('setup');
     let ses = null;
     try { ses = JSON.parse(sessionStorage.getItem('ad_sesion') || 'null'); } catch (e) { /* sin sessionStorage */ }

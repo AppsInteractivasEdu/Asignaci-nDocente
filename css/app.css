@@ -496,6 +496,11 @@ select.inp { cursor: pointer; }
    TABLA MOBILE
    ═══════════════════════════════════════════════════════ */
 .table-desktop { display: block; }
+/* Encabezado de la tabla de asignación fijo bajo la barra superior y las pestañas */
+#v-asignacion .card { overflow: visible; }
+#v-asignacion .table-wrap { overflow: visible; }
+#v-asignacion .filters { border-radius: var(--radius) var(--radius) 0 0; }
+#asig-table th { top: var(--sticky-top, 113px); z-index: 30; box-shadow: 0 1px 0 var(--border), 0 4px 8px -6px rgba(20,30,60,.25); }
 .rows-mobile { display: none; }
 @media (max-width: 768px) {
   .table-desktop { display: none; }
