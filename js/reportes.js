@@ -38,6 +38,10 @@
     { h: 'Alternativas (orden de pertinencia)', k: 'alternativas', w: 40 },
     { h: 'Perfil asociado (documento)', k: 'perfilAsociado', w: 34 },
     { h: 'Asignación manual', k: 'manual', w: 10 },
+    { h: 'Docente 2026-II (antecedente)', k: 'docente2026', w: 28 },
+    { h: 'Tipo de asignación', k: 'tipoAsignacion', w: 16 },
+    { h: 'Carga total proyectada 2027-I (h)', k: 'cargaTotal', w: 14 },
+    { h: 'Docentes para revisión del Director', k: 'revisionDirector', w: 44 },
   ];
 
   function fmtFecha(d) {

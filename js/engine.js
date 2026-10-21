@@ -835,12 +835,30 @@
     return { s: 'I', det: 'Estado de la hoja de vida no registrado.' };
   }
 
+  // Lic. en Ciencias Naturales y Educación Ambiental (PPI y didácticas distintas de Física): no se admiten pregrados en Física/Matemáticas o afines.
+  const FIS_MAT = /fisic|matematic|astronom/;
+  function aplicaExclusionCN(perfil) {
+    if (!/ciencias naturales/.test(norm(perfil.programa || ''))) return false;
+    if (perfil.componenteDoc === COMP.PED) return false;
+    const nombre = norm(perfil.asignatura || perfil.titulo || '');
+    return perfil.componenteDoc === COMP.PPI || esNombrePPI(nombre) || !/fisic/.test(nombre);
+  }
+
   /** Evalúa a un profesor frente a un perfil. */
   function evaluar(perfil, prof, cfg, rapido) {
     cfg = cfg || DEFAULT_CONFIG;
     prepararProfesor(prof);
     const req = requisitos(perfil);
-    const pre = evalPregrado(req, prof);
+    let profPre = prof, excluido = false;
+    if (aplicaExclusionCN(perfil)) {
+      const tit = prof.titulos.filter(t => !(t.nivel === 'Profesional' && FIS_MAT.test(norm(t.titulo))));
+      if (tit.length !== prof.titulos.length) {
+        profPre = Object.assign({}, prof, { titulos: tit });
+        excluido = !tit.some(t => t.nivel === 'Profesional');
+      }
+    }
+    let pre = evalPregrado(req, profPre);
+    if (excluido) pre = { s: 'N', det: 'Su pregrado (' + prof.titulos.filter(t => t.nivel === 'Profesional').map(t => t.titulo).join('; ') + ') corresponde a Física, Matemáticas o afines, no admitido para esta licenciatura.' };
     const pos = evalPosgrado(req, prof);
     if (rapido && (pos.s === 'N' || (pre.s === 'N' && pos.s !== 'A' && pos.s !== 'F'))) return { tier: 0, pre, pos };
     const exp = evalExperiencia(req, prof);
@@ -865,6 +883,7 @@
     else if (hard.every(s => s !== 'N') && !hard.includes('I')) tier = 2; // cumple con afinidad (validar)
     else if (hard.every(s => s !== 'N')) tier = 1;                         // información insuficiente
     else tier = 0;
+    if (excluido) { tier = 0; soloPosgrado = false; }
 
     // Puntaje de pertinencia (0-100)
     let score = 0;
@@ -1210,7 +1229,7 @@
         r.estado = EST.PEND;
         if (f.bloqueos.length) r.observaciones.unshift(...obsBloqueos());
         if (r.excedeTope) r.observaciones.unshift('La carga estimada de la asignatura (' + r.horas + ' h) supera el tope de ' + cfg.maxHoras + ' h por docente; requiere distribución por grupos o definición de horas de acompañamiento. Profesores idóneos identificados: ' + (r.nIdoneos || 0) + '.');
-        else if (r.nCandidatos > 0) r.observaciones.unshift('Los ' + r.nCandidatos + ' profesores con correspondencia verificable alcanzaron el tope de ' + cfg.maxHoras + ' h de carga.');
+        else if (r.nCandidatos > 0) r.observaciones.unshift('No se propone la asignación porque el profesor superaría el límite máximo de ' + horasMax + ' horas de carga académica total en la Universidad del Magdalena: los ' + r.nCandidatos + ' profesores con correspondencia verificable ya alcanzaron el tope de ' + cfg.maxHoras + ' h.');
         else {
           const k = info.conteo;
           r.observaciones.unshift('Ningún profesor de la base acredita simultáneamente los requisitos obligatorios del perfil (pregrado: ' + k.pregrado + ' cumplen; posgrado y pregrado: ' + k.posgrado + '; con experiencia docente suficiente: ' + k.experiencia + ').');
@@ -1282,6 +1301,10 @@
         revision: c.revisionClasificacion || '',
         manual: r.manual ? 'Sí' : 'No',
         docenteId: r.docenteId || '',
+        docente2026: r.f7 && r.f7.prev26 && r.f7.prev26.length ? r.f7.prev26.join('; ') : '',
+        tipoAsignacion: r.f7 && r.f7.tipo ? ({ continuidad: 'Continuidad', 'progresión': 'Progresión PPI', nueva: 'Nueva asignación', pendiente: 'Pendiente' }[r.f7.tipo] || '') : '',
+        cargaTotal: r.f7 && r.f7.cargaTotal != null ? r.f7.cargaTotal : '',
+        revisionDirector: (r.revisionDirector || []).map((a, i) => (i + 1) + '. ' + a.nombre + (a.pregrado ? ' (pregrado: ' + a.pregrado + ')' : '')).join('\n'),
         f7: r.f7 || null,
       };
     });
@@ -1356,6 +1379,13 @@
     // 10. perfiles sin asignatura
     const huerf = extra.huerfanos || [];
     ok('Todos los perfiles suministrados corresponden a asignaturas de los planes', !huerf.length, huerf.length ? huerf.length + ' perfiles sin asignatura asociada: ' + huerf.slice(0, 8).map(p => p.programa.replace('Licenciatura en ', '') + ' – ' + p.titulo).join('; ') + (huerf.length > 8 ? '…' : '') : 'Sin perfiles huérfanos.', 'Revisar');
+    // Fase 7: pregrado primero, continuidad sustentada y carga institucional
+    const preMal = filas.filter(x => x.r.docenteId && !x.r.manual && x.r.ev && x.r.ev.pre.s !== 'A' && !x.r.ev.pre.sinReq);
+    ok('Toda propuesta automática tiene pregrado afín con la asignatura (criterio previo)', !preMal.length, preMal.length ? preMal.length + ' propuestas automáticas sin pregrado afín.' : 'Sin excepciones: los docentes con pregrado no afín solo quedan para revisión del Director.');
+    const contMal = filas.filter(x => x.r.f7 && ['continuidad', 'progresión'].includes(x.r.f7.tipo) && (!x.r.ev || x.r.ev.tier !== 3));
+    ok('Las continuidades y progresiones están sustentadas en cumplimiento verificado del perfil', !contMal.length, contMal.length ? contMal.length + ' casos sin cumplimiento verificado (asignaciones manuales).' : 'Todas verifican pregrado, posgrado, experiencia y hoja de vida.');
+    const cargaMal = filas.filter(x => x.r.f7 && x.r.f7.cargaTotal != null && x.r.f7.cargaTotal > analisis.config.maxHoras);
+    ok('Ninguna propuesta supera el tope de ' + analisis.config.maxHoras + ' h de carga total institucional', !cargaMal.length, cargaMal.length ? cargaMal.length + ' asignaciones superan el tope considerando la carga de otras unidades.' : 'Carga total (propuesta + otras unidades cargadas) dentro del tope.');
     const alertas = ds.perfiles.filter(p => p.alertas.length);
     ok('Documentos de perfiles completos', !alertas.length, alertas.length + ' perfiles con secciones faltantes o inconsistentes: ' + alertas.map(p => p.programa.replace('Licenciatura en ', '') + ' – ' + p.titulo).join('; '), 'Revisar');
     return checks;

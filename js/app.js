@@ -326,7 +326,8 @@
         '<button class="btn" data-dl="programa" ' + (prog ? '' : 'disabled title="Seleccione un programa en «Asignación docente»"') + '>⬇ Excel del programa' + (prog ? ': ' + esc(corto(prog)) : ' seleccionado') + '</button>' +
         '<button class="btn primary" data-dl="consolidado">⬇ Excel general consolidado</button>' +
         '<button class="btn" data-dl="pendientes">⬇ Asignaturas sin docente asignado</button>' +
-        (i === 0 ? '<button class="btn" data-dl="inventario">⬇ Inventario</button><button class="btn" data-dl="matriz">⬇ Matriz de correspondencia</button>' : '');
+        (i === 0 ? '<button class="btn" data-dl="inventario">⬇ Inventario</button><button class="btn" data-dl="matriz">⬇ Matriz de correspondencia</button>' : '') +
+        (S.fuentes && S.fuentes.historico7 ? '<button class="btn" data-dl="' + (prog ? 'comparativoPrograma' : 'comparativo') + '">⬇ Comparativo 2026-II vs 2027-I' + (prog ? ': ' + esc(corto(prog)) : '') + '</button>' : '');
     });
     $$('[data-dl]').forEach(b => b.onclick = () => descargar(b.dataset.dl));
   }
